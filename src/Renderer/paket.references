@@ -1,0 +1,12 @@
+nuget Fable.Core 
+nuget FSharp.Core redirects:force
+nuget Fable.Browser.Dom
+nuget Fable.Recharts
+nuget Fable.SimpleJson
+nuget Fable.Electron
+nuget Fable.Elmish
+nuget Fable.Elmish.Debugger
+nuget Fable.Elmish.HMR
+nuget Fable.Elmish.React
+nuget Fable.Promise
+nuget Fable.React

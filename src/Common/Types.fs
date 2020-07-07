@@ -1,5 +1,6 @@
 module CommonTypes
 
+
 //==========================================//
 // Canvas state mapped to f# data structure //
 //==========================================//

@@ -11,10 +11,12 @@ open CommonTypes
 
 open Fable.Core
 open Fable.Core.JsInterop
-open Fable.Import
-open Fable.Import.Electron
+open Electron
 open Fable.SimpleJson
-open Node.Exports
+open Node.Api
+
+
+
 
 let private stateToJsonString (state : CanvasState) : string =
     Json.stringify state
@@ -22,9 +24,13 @@ let private stateToJsonString (state : CanvasState) : string =
 let private jsonStringToState (jsonString : string) =
     Json.tryParseAs<CanvasState> jsonString
 
+
+
+
+
 let private tryLoadStateFromPath filePath =
     let dataBuffer = fs.readFileSync (filePath, Option.None)
-    dataBuffer.toString "utf8" |> jsonStringToState
+    dataBuffer.ToString() |> jsonStringToState
 
 /// Extract the labels and bus widths of the inputs and outputs nodes.
 let private parseDiagramSignature canvasState
@@ -57,14 +63,13 @@ let private getBaseNameNoExtension filePath =
             )
         firstSplit + rest
 
-let private projectFileFilters =
-    ResizeArray [ createObj [
-        "name" ==> "DEflow project file"
-        "extensions" ==> ResizeArray [ "dprj" ]
-    ] ] |> Some
 
-let private projectFilters =
-    ResizeArray [ createObj [ "name" ==> "DEflow project" ] ] |> Some
+
+let private projectFileFilters: FileFilter array =
+     [| !!{| name = "DEflow project file" ; extensions = [| "dprj" |] |} |]
+
+let private projectFilters: FileFilter array =
+     [| !!{| name = "DEflow project"; extensions=[||];|} |]
 
 /// Ask the user to choose a project file, with a dialog window.
 /// Return the folder containing the chosen project file.
@@ -72,22 +77,18 @@ let private projectFilters =
 let askForExistingProjectPath () : string option =
     let options = createEmpty<OpenDialogOptions>
     options.filters <- projectFileFilters
-    let paths = electron.remote.dialog.showOpenDialog(options)
-    match isNull paths with
-    | true -> Option.None // User did not completed the load dialog interaction.
-    | false -> match Seq.toList paths with
-               | [] -> Option.None
-               | p :: _ -> Some <| path.dirname p
+    let paths = electron.remote.dialog.showOpenDialogSync(options)  
+    match paths with
+    | Some [| p |] -> path.dirname p |> Some
+    | _ -> Option.None
 
 /// Ask the user a new project path, with a dialog window.
-/// Return None if the user exits withouth selecting a path.
+/// Return None if the user exits without selecting a path.
 let askForNewProjectPath () : string option =
     let options = createEmpty<SaveDialogOptions>
     options.filters <- projectFilters
-    let path = electron.remote.dialog.showSaveDialog(options)
-    match isNull path with
-    | true -> Option.None // User did not completed the load dialog interaction.
-    | false -> Option.Some path
+    electron.remote.dialog.showSaveDialogSync(options)
+
 
 let tryCreateFolder (path : string) =
     try

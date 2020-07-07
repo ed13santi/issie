@@ -1,49 +1,55 @@
 {
   "private": true,
-  "main": "app/main.js",
+  "main": "DECAD",
+  "version": "0.3.0",
   "scripts": {
-    "start": "cd src/Main && dotnet fable webpack --port free -- -w --config webpack.config.js",
-    "build": "cd src/Main && dotnet fable webpack --port free -- -p --config webpack.config.js",
-    "launch": "electron .",
-    "debug": "electron . --debug",
-    "make-osx-dmg": "yarn electron-installer-dmg --overwrite --icon=app/icon.ico dist/deflow-darwin-x64 dist/deflow-osx",
-    "pack-nobuild-linux": "electron-packager . DEflow --platform=linux --arch=x64 --out=dist --prune --asar --ignore=/dist --ignore=/src --overwrite && yarn cross-zip dist/deflow-linux-x64",
-    "pack-nobuild-win": "electron-packager . DEflow --platform=win32 --arch=x64 --out=dist --prune --ignore=/dist --ignore=/src --overwrite --icon=app/icon.ico && yarn cross-zip dist/deflow-win32-x64",
-    "pack-nobuild-osx": "electron-packager . DEflow --platform=darwin --arch=x64 --out=dist --prune --asar --ignore=/dist --ignore=/src --overwrite --icon=app/icon.ico && yarn make-osx-dmg",
-    "pack-linux": "yarn build && yarn pack-nobuild-linux",
-    "pack-win": "yarn build && yarn pack-nobuild-win",
-    "pack-osx": "yarn build && yarn pack-nobuild-osx && yarn make-osx-dmg",
-    "pack-all": "yarn run build && yarn pack-nobuild-win && yarn pack-nobuild-linux && yarn pack-nobuild-osx"
+    "dev": "electron-webpack dev",
+    "compile": "electron-webpack",
+    "dist": "npm run compile && electron-builder",
+    "dist:dir": "npm run dist --dir -c.compression=store -c.mac.identity=null"
+  },
+  "electronWebpack": {
+    "title": true,
+    "staticSourceDirectory": "website",
+    "main": {
+      "sourceDirectory": "src/Main",
+      "webpackConfig": "webpack.additions.main.js"
+    },
+    "renderer": {
+      "sourceDirectory": "src/Renderer",
+      "template": "website/index.html",
+      "webpackConfig": "webpack.additions.renderer.js"
+    }
   },
   "dependencies": {
-    "babel": "^6.23.0",
-    "babel-runtime": "6.26.0",
-    "bulma": "^0.7.2",
-    "cross-zip": "^3.1.0",
-    "cross-zip-cli": "^1.0.0",
-    "css-loader": "^2.1.0",
-    "electron-packager": "^14.2.1",
+    "bulma": "^0.9.0",
     "file-loader": "^3.0.1",
     "font-awesome": "^4.7.0",
+    "jquery": "^3.3.1",
+    "jquery-ui": "^1.12",
     "node-sass": "^4.12.0",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "rechart": "^0.0.1",
     "sass-loader": "^7.1.0",
+    "source-map-support": "^0.5.16",
     "style-loader": "^0.23.1"
   },
   "devDependencies": {
-    "babel-core": "6.26.0",
-    "babel-loader": "7.1.2",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "babel-preset-es2015": "6.24.1",
-    "electron": "^1.8.8",
-    "electron-installer-dmg": "^3.0.0",
-    "fable-loader": "^1.1.4",
-    "fable-utils": "^1.0.6",
-    "loglevel": "^1.5.1",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "@babel/core": "^7.8.4",
+    "bufferutil": "^4.0",
+    "devtron": "^1.4",
+    "electron": "^8.0.0",
+    "electron-builder": "^22.3.2",
+    "electron-devtools-installer": "^3.1.0",
+    "electron-webpack": "^2.6",
+    "electron-window-state": "^5.0",
+    "fable-compiler": "^2.4.13",
+    "fable-loader": "^2.1",
+    "node-sass": "^4.13.1",
+    "remotedev": "^0.2",
+    "sass-loader": "^8.0.2",
+    "utf-8-validate": "^5.0",
+    "webpack": "^4.41.6"
   }
 }

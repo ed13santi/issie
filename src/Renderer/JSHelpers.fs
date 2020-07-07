@@ -8,8 +8,20 @@ module JSHelpers
 
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.React
+open Browser.Types
 
 open Helpers
+
+[<Emit("__static")>]
+let getStaticFilePath(): string = jsNative
+
+[<Emit("window.$ = window.jQuery = require('../../static/lib/jquery/jquery.min.js')")>]
+let initJQuery():unit = jsNative
+
+[<Emit("resolve('public/lib/jquery/jquery-ui.js')")>]
+let initJQueryUI(): unit = jsNative
+
 
 [<Emit("typeof $0")>]
 let jsType (var: obj) : unit = jsNative
@@ -71,13 +83,16 @@ let fshaprListToJsList (list : 'a list) =
     jsList
 
 /// Get the value for a change event in an input textbox.
-let getTextEventValue (event: Fable.Import.React.FormEvent) =
+let getTextEventValue (event: Event) =
     getFailIfNull event.currentTarget ["value"] |> unbox<string>
 
 /// Get the value for a change event in an input number box.
-let getIntEventValue (event: Fable.Import.React.FormEvent) =
+let getIntEventValue (event: Event) =
     getFailIfNull event.currentTarget ["value"] |> unbox<int>
 
 /// Get the value for a blur event in an input textbox.
-let getTextFocusEventValue (event: Fable.Import.React.FocusEvent) =
+let getTextFocusEventValue (event: Event) =
     getFailIfNull event ["target";"value"] |> unbox<string>
+
+let getPromiseResult (p: JS.Promise<'T>) (resFunc: Result<'T,'E>-> 'R) =
+    p.``then``( fun r -> resFunc (Ok r), fun r -> resFunc (Error r))
