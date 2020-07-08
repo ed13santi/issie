@@ -23,15 +23,14 @@ Target.create "Clean" (fun _ ->
   |> Shell.cleanDirs
 )
 
-Target.create "DotnetRestore" (fun _ -> ()
-    (* DotNet.restore) 
-    (DotNet.Options.withWorkingDirectory __SOURCE_DIRECTORY__)*)
-    
+Target.create "DotnetRestore" (fun _ -> 
+    DotNet.restore id "Renderer.sln"
 )
 
 Target.create "NpmInstall" (fun _ ->
   Npm.install id
 )
+
 
 Target.create "Build" (fun _ ->
   Npm.run "compile" id
@@ -43,6 +42,10 @@ Target.create "Dev" (fun _ ->
 
 Target.create "Dist" (fun _ ->
   Npm.run "dist" id
+)
+
+Target.create "Compile" (fun _ ->
+  Npm.run "compile" id
 )
 
 Target.create "DistDir" (fun _ ->

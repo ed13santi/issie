@@ -66,10 +66,10 @@ let private getBaseNameNoExtension filePath =
 
 
 let private projectFileFilters: FileFilter array =
-     [| !!{| name = "DEflow project file" ; extensions = [| "dprj" |] |} |]
+     [| !!{| Name = "DEflow project file" ; Extensions = [| "dprj" |] |} |]
 
 let private projectFilters: FileFilter array =
-     [| !!{| name = "DEflow project"; extensions=[||];|} |]
+     [| !!{| Name = "DEflow project"; Extensions= [| |]|} |]
 
 /// Ask the user to choose a project file, with a dialog window.
 /// Return the folder containing the chosen project file.
@@ -86,7 +86,8 @@ let askForExistingProjectPath () : string option =
 /// Return None if the user exits without selecting a path.
 let askForNewProjectPath () : string option =
     let options = createEmpty<SaveDialogOptions>
-    options.filters <- projectFilters
+    options.filters <- projectFileFilters
+    options.nameFieldLabel <- "Create New Project Here"
     electron.remote.dialog.showSaveDialogSync(options)
 
 
@@ -111,8 +112,12 @@ let writeFile path data =
     fs.writeFileSync(path, data, options)
 
 /// Save state to file. Automatically add the .dgm suffix.
-let saveStateToFile folderPath baseName state = // TODO: catch error?
-    let path = pathJoin [| folderPath; baseName + ".dgm" |]
+let saveStateToFile folderPath (baseName:string) state = // TODO: catch error?
+    let baseNameWithExt =
+        if baseName.EndsWith(".dgm") 
+        then baseName 
+        else baseName + ".dgm"
+    let path = pathJoin [| folderPath;  baseNameWithExt|]
     let data = stateToJsonString state
     writeFile path data
 
