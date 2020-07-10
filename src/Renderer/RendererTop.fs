@@ -10,7 +10,10 @@ open Electron
 open JSHelpers
 open Node
 
-//importSideEffects "./../../src/website/scss/main.scss" 
+
+
+
+
 
 // Keybindings.
 // Use Elmish subscriptions to attach external source of events such as keyboard

@@ -1,8 +1,15 @@
 module JSTypes
+open Fable.Core
+open Fable.Core.JsInterop
 
 //=========================================//
 // Types for interface with draw2d library //
 //=========================================//
+
+
+
+
+
 
 type JSCanvas      = | JSCanvas of obj
 type JSComponent   = | JSComponent of obj

@@ -2,8 +2,8 @@
  * Draw2d functions that are used in the Draw2dWrapper.fs file.
  */
 
-import { setDispatchMessages } from "../../../public/lib/draw2d_extensions/MVU_messages.js"
-import { createDigitalConnection } from "../../../public/lib/draw2d_extensions/draw2d_digital_connections.js"
+import { setDispatchMessages } from "../JSImports/lib/draw2d_extensions/MVU_messages.js";
+import { createDigitalConnection } from "../JSImports/lib/draw2d_extensions/draw2d_digital_connections.js";
 
 function createCanvas(id, width, height) {
     let canvas = new draw2d.Canvas(id, width, height);
@@ -274,7 +274,7 @@ function createDigitalRAM(x, y, addressWidth, wordWidth, memData) {
 }
 
 function writeMemoryLine(comp, addr, value) {
-    if (comp.memData == null || comp.memData === "undefined") {
+    if (comp.memData === null || comp.memData === "undefined") {
         throw `Cannot write memory line of component that does not have a memory: ${comp.componentType}`;
     }
     if (addr >= comp.memData.length) {
@@ -285,7 +285,7 @@ function writeMemoryLine(comp, addr, value) {
 
 /// Should only be used for Input, Output and NbitsAdder components.
 function setNumberOfBits(comp, numberOfBits) {
-    if (comp.numberOfBits == null || comp.numberOfBits === "undefined") {
+    if (comp.numberOfBits === null || comp.numberOfBits === "undefined") {
         throw `Cannot set number of bits of component: ${comp.componentType}`;
     }
     comp.numberOfBits = numberOfBits;
@@ -295,7 +295,7 @@ function setNumberOfBits(comp, numberOfBits) {
 
 /// Should only be used for SplitWire nodes.
 function setTopOutputWidth(comp, topOutputWidth) {
-    if (comp.topOutputWidth == null || comp.topOutputWidth === "undefined") {
+    if (comp.topOutputWidth === null || comp.topOutputWidth === "undefined") {
         throw `Cannot set topOutputWidth of non-SplitWire component: ${comp.componentType}`;
     }
     comp.topOutputWidth = topOutputWidth;
@@ -304,7 +304,7 @@ function setTopOutputWidth(comp, topOutputWidth) {
 
 /// Should only be used for Register nodes.
 function setRegisterWidth(comp, regWidth) {
-    if (comp.regWidth == null || comp.regWidth === "undefined") {
+    if (comp.regWidth === null || comp.regWidth === "undefined") {
         throw `Cannot set regWidth of non-Register component: ${comp.componentType}`;
     }
     comp.regWidth = regWidth;

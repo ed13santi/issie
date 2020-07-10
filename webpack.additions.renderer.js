@@ -9,7 +9,6 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
 
     entry: [
-        resolve('static/main.scss'),
         resolve("src/Renderer/Renderer.fsproj")],
     output: {
         filename: "renderer.js"
@@ -20,6 +19,14 @@ module.exports = {
                 test: /\.fs(x|proj)?$/,
                 use: {
                     loader: "fable-loader"
+                }
+            },
+            {
+                test: require.resolve('jquery'),
+                loader: 'expose-loader',
+                options: {
+                    // For `underscore` library, it can be `_.map map` or `_.map|map`
+                    exposes: 'jquery',
                 }
             }
         ]

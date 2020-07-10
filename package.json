@@ -10,7 +10,7 @@
   },
   "electronWebpack": {
     "title": true,
-    "staticSourceDirectory":  "static",
+    "staticSourceDirectory": "static",
     "main": {
       "sourceDirectory": "src/Main",
       "webpackConfig": "webpack.additions.main.js"
@@ -51,6 +51,7 @@
     "remotedev": "^0.2",
     "sass-loader": "^8.0.2",
     "utf-8-validate": "^5.0",
-    "webpack": "^4.41.6"
+    "webpack": "^4.41.6",
+    "expose-loader": "^1.0.0"
   }
 }

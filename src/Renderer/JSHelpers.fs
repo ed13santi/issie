@@ -13,14 +13,27 @@ open Browser.Types
 
 open Helpers
 
-[<Emit("__static")>]
-let getStaticFilePath(): string = jsNative
+//importSideEffects @"JSImports/lib/jquery/draw2d.js"
 
-[<Emit("window.$ = window.jQuery = require('../../static/lib/jquery/jquery.min.js')")>]
-let initJQuery():unit = jsNative
 
-[<Emit("resolve('public/lib/jquery/jquery-ui.js')")>]
-let initJQueryUI(): unit = jsNative
+importSideEffects @"./JSImports/main.scss" 
+
+importSideEffects @"./JSImports/lib/draw2d.js"
+
+importAll  "draw2d"
+
+importSideEffects @"./JSImports/lib/draw2d_extensions/MVU_messages"
+
+
+importSideEffects @"./JSImports/lib/draw2d_extensions/draw2d_digital_components.js"
+
+
+importSideEffects @"./JSImports/lib/draw2d_extensions/draw2d_digital_connections.js"
+
+
+importSideEffects @"./JSImports/lib/draw2d_extensions/drag_connection_create_policy_fixed.js"
+
+
 
 
 [<Emit("typeof $0")>]
