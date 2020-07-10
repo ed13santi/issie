@@ -26,7 +26,7 @@ node_modules/
 # Paket
 .paket/paket.exe
 
-.config/
+
 .vscode/
 
 ## Ignore Visual Studio temporary files, build results, and
