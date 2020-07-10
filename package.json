@@ -17,7 +17,6 @@
     },
     "renderer": {
       "sourceDirectory": "src/Renderer",
-      "template": "src/renderer/template.html",
       "webpackConfig": "webpack.additions.renderer.js"
     }
   },
@@ -33,7 +32,8 @@
     "rechart": "^0.0.1",
     "sass-loader": "^7.1.0",
     "source-map-support": "^0.5.16",
-    "style-loader": "^0.23.1"
+    "style-loader": "^0.23.1",
+    "draw2d": "^1.0.27"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -51,7 +51,6 @@
     "remotedev": "^0.2",
     "sass-loader": "^8.0.2",
     "utf-8-validate": "^5.0",
-    "webpack": "^4.41.6",
-    "expose-loader": "^1.0.0"
+    "webpack": "^4.41.6"
   }
 }

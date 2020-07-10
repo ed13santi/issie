@@ -17,7 +17,7 @@ open Helpers
 
 
 importSideEffects @"./JSImports/main.scss" 
-
+(*
 importSideEffects @"./JSImports/lib/draw2d.js"
 
 importAll  "draw2d"
@@ -33,7 +33,7 @@ importSideEffects @"./JSImports/lib/draw2d_extensions/draw2d_digital_connections
 
 importSideEffects @"./JSImports/lib/draw2d_extensions/drag_connection_create_policy_fixed.js"
 
-
+*)
 
 
 [<Emit("typeof $0")>]

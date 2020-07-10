@@ -5,7 +5,7 @@
  * function (toward the bottom of the file).
  */
 
-//import * as draw2d from "draw2d"
+import * as draw2d from "draw2d"
 
 draw2d.policy.connection.DragConnectionCreatePolicy = draw2d.policy.connection.ConnectionCreatePolicy.extend(
     /** @lends draw2d.policy.connection.DragConnectionCreatePolicy.prototype */

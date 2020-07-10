@@ -21,14 +21,6 @@ module.exports = {
                     loader: "fable-loader"
                 }
             },
-            {
-                test: require.resolve('jquery'),
-                loader: 'expose-loader',
-                options: {
-                    // For `underscore` library, it can be `_.map map` or `_.map|map`
-                    exposes: 'jquery',
-                }
-            }
         ]
     }
 };

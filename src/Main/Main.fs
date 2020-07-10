@@ -6,10 +6,13 @@ open Fable.Import
 open Electron
 open Node.Api
 
+
+
 // A global reference to the window object is required in order to prevent garbage collection
 let mutable mainWindow: BrowserWindow option = None
 
 DarkModeWorkaround.init ()
+
 
 
 let createMainWindow () =
@@ -24,8 +27,10 @@ let createMainWindow () =
       o.width <- mainWinState.width
       o.height <- mainWinState.height
       o.autoHideMenuBar <- true
+      o.icon <- U2.Case2 (path.join(__dirname,"../static/icon.ico"))
       o.webPreferences <- jsOptions<WebPreferences>(fun w ->
         w.nodeIntegration <- true
+        w.preload <- path.resolve(path.join(__dirname,"preload.js"))
       )
       o.show <- false
     ))

@@ -13,7 +13,7 @@
  * a good idea to merge the similar parts?
  */
 
-//import * as draw2d from "draw2d"
+import * as draw2d from "draw2d"
 
 draw2d.shape.digital = draw2d.SVGFigure.extend({
 

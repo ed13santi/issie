@@ -90,6 +90,12 @@ let view model dispatch = DiagramMainView.displayView model dispatch
 
 let update msg model = DiagramMainView.update msg model
 
+let hello() =
+    printfn "**** Starting Renderer ****"
+
+hello()
+
+
 Program.mkSimple init update view
 |> Program.withReactBatched "electron-app"
 |> Program.withSubscription attachKeyShortcuts

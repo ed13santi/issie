@@ -83,8 +83,12 @@ type private IDraw2d =
     abstract redoLastAction               : canvas:JSCanvas -> unit
     abstract flushCommandStack            : canvas:JSCanvas -> unit
 
+printfn "Checkpoint 2"
+
 [<Import("*", "./draw2d_fsharp_interface.js")>]
 let private draw2dLib : IDraw2d = jsNative
+
+printfn "Checkpoint 3"
 
 // Helpers.
 

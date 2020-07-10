@@ -66,10 +66,10 @@ let private getBaseNameNoExtension filePath =
 
 
 let private projectFileFilters: FileFilter array =
-     [| !!{| Name = "DEflow project file" ; Extensions = [| "dprj" |] |} |]
+     [| !!{| name = "DEflow project file" ; extensions = [| "dprj" |] |} |]
 
 let private projectFilters: FileFilter array =
-     [| !!{| Name = "DEflow project"; Extensions= [| |]|} |]
+     [| !!{| name = "DEflow project"; extensions= [| |]|} |]
 
 /// Ask the user to choose a project file, with a dialog window.
 /// Return the folder containing the chosen project file.

@@ -3,7 +3,7 @@
  * to connections.
  */
 
-//import * as draw2d from "draw2d"
+import * as draw2d from "draw2d"
 
 
 /// Custom locator for the bus label.
