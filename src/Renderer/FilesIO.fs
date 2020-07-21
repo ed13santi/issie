@@ -61,14 +61,14 @@ let private getBaseNameNoExtension filePath =
 
 let private projectFileFilters =
     createObj !![
-        "name" ==> "ISSIE project file"
+        "name" ==> "DECAD project file"
         "extensions" ==> ResizeArray [ "dprj" ]
     ] 
     |> unbox<FileFilter> 
     |> Array.singleton
 
 let private projectFilters =
-    createObj !![ "name" ==> "ISSIE project" ]
+    createObj !![ "name" ==> "DECAD project" ]
     |> unbox<FileFilter>
     |> Array.singleton
 
