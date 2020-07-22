@@ -156,11 +156,6 @@ let displayWaveform parameters (ind: int) wave  =
         let topRight = makeSigLine (rightLim, sigCentre) (right, sigTop)
         let bottomRight = makeSigLine (rightLim, sigCentre) (right, sigBot)
 
-        let clockMarkerLine = 
-            let lineTmp = makeSigLineArg (rightLim, sigBot) (rightLim, sigTop)
-            { lineTmp with colour = "gray"; thickness = clkThick }
-            |> makeLine
-
         let text =
             text 
                 [
@@ -181,7 +176,7 @@ let displayWaveform parameters (ind: int) wave  =
             [topRight; bottomRight]
         | false, false -> 
             []
-        |> List.append [text; clockMarkerLine; top; bottom]
+        |> List.append [text; top; bottom]
         //should there be the impossible case???
 
     let label =
@@ -210,16 +205,24 @@ let displayWaveform parameters (ind: int) wave  =
             |> List.collect makeBusSegment
     label, waveSvgElements
 
-let makeBackground parameters = 
-    let width = float parameters.hBoxSize
-    let height = float parameters.vBoxSize
-    let top = float parameters.vPos
+let makeBackground (model : WaveSimModel) = 
+    let p = model.viewParams
+
+    let width = float p.hBoxSize
+    let height = float p.vBoxSize
+    let top = float p.vPos
     let bot = top + height
     let left = 0.0 //float parameters.hPos + float parameters.hNameSize
     let right = width
     let clkThickness = 0.025 //TODO: change to variable
-    let clkLen = float parameters.hSize
-    
+    let clkLen = float p.hSize
+
+    let maxWaveformLen =
+        List.map (fun x -> signalLength x.wIn) model.waves
+        |> List.max
+        |> float
+        |> (*) clkLen
+
     let clkLine x = 
         { dfltSigLine with 
             pointA = x, top
@@ -229,10 +232,12 @@ let makeBackground parameters =
         }
         |> makeLine
 
-    [(int (left / clkLen) + 1)..1..(int (8.0 / clkLen) + 1)]
-    |> List.map ((fun x -> float x * clkLen) >> clkLine)
-    |> List.append [makeBox (left,top) (8.0,bot)]
+    let clkLines = 
+        [(int (left / clkLen) + 1)..1..(int (maxWaveformLen / clkLen) + 1)]
+        |> List.map ((fun x -> float x * clkLen) >> clkLine)
+    let simBox =  [makeBox (left,top) (8.0,bot)]
 
+    clkLines, simBox
     
 //view function of the waveform simulator
 
@@ -273,12 +278,13 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
                 [ Button.Color IsDanger; Button.OnClick (fun _ -> hZoom false ()) ]
                 [ str "H Zoom -" ]
             hr []
-            let displayWaveWithParams = displayWaveform simModel.viewParams  
+            let displayWaveWithParams = displayWaveform simModel.viewParams 
+            let svgBg = makeBackground simModel
             let svgElements = List.mapi displayWaveWithParams simModel.waves 
             let svgWaveforms = 
                 svgElements
                 |> List.collect snd
-                |> List.append (makeBackground simModel.viewParams)
+                |> List.append (fst svgBg)
             let svgLabels =
                 svgElements
                 |> List.map fst
@@ -296,6 +302,8 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
                 |> appInv " "
                 |> appInv (string (scaleY + 0.5))
                 |> string
+            let boxVBparams = 
+                "0 0 8 " + string (scaleY + 0.5)
             let widthWave = 
                 100.0 * scaleX / 8.0
                 |> int
@@ -303,20 +311,34 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
                 |> appInv "%"
                 |> string
 
-            div []
+
+            div 
+                [ Style [Float FloatOptions.Left; Width "20%"] ]
                 [
-                div 
-                    [ Style [Float FloatOptions.Left; Width "20%"] ]
-                    [
-                    svg 
-                        [ViewBox labelVBparams; unbox ("width", "100%")]
-                        svgLabels
+                svg 
+                    [ViewBox labelVBparams; unbox ("width", "100%")]
+                    svgLabels
+                ]
+            div 
+                [                      
+                Style [Float FloatOptions.Right; 
+                        Width "80%";
+                        Position PositionOptions.Relative]            
+                ]
+                [
+                svg 
+                    [ 
+                    ViewBox boxVBparams; 
+                    Style [Position PositionOptions.Absolute];
+                    unbox ("width", "100%") 
+                    unbox ("y", "0") 
                     ]
+                    (snd svgBg)
                 div 
-                    [                      
-                    Style [OverflowX OverflowOptions.Scroll;
-                            Float FloatOptions.Right;
-                            Width "80%"]            
+                    [
+                    Style [Width "100%"; 
+                            OverflowX OverflowOptions.Scroll; 
+                            Position PositionOptions.Absolute]
                     ]
                     [
                     svg 
@@ -324,7 +346,7 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
                         ViewBox wavesVBparams; 
                         unbox ("width", widthWave) 
                         ]
-                        svgWaveforms              
-                    ]
-                ] 
-        ]
+                        svgWaveforms 
+                    ]             
+                ]
+            ] 
