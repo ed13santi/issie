@@ -5,7 +5,20 @@ open Fable.Core.JsInterop
 open Electron
 open Node
 
-#if DEBUG
+let args = 
+    Api.``process``.argv
+    |> Seq.toList
+    |> List.map (fun s -> s.ToLower())
+
+/// Returns true if any of flags are present as command line argument.    
+let argFlagIsOn (flags:string list) = 
+    let fl = List.map (fun (s:string) -> s.ToLower()) flags
+    List.exists (fun flag -> List.contains flag args) fl
+
+let hasDebugArgs() = argFlagIsOn ["--debug";"-d"]
+
+let debug = true
+
 module DevTools =
     let private installDevTools (extensionRef: obj) (forceDownload: bool): JS.Promise<string> =
         importDefault "electron-devtools-installer"
@@ -33,21 +46,15 @@ module DevTools =
         win.webContents.executeJavaScript ("require('devtron').uninstall()")
 
     let connectRemoteDevViaExtension: unit -> unit = import "connectViaExtension" "remotedev"
-#endif
 
+<<<<<<< HEAD
 electron.app.name <- "DEflow"
+=======
+>>>>>>> master
 
-let args = 
-    Api.``process``.argv
-    |> Seq.toList
-    |> List.map (fun s -> s.ToLower())
+electron.app.name <- "Issie"
 
-/// Returns true if any of flags are present as command line argument.    
-let argFlagIsOn (flags:string list) = 
-    let fl = List.map (fun (s:string) -> s.ToLower()) flags
-    List.exists (fun flag -> List.contains flag args) fl
 
-let hasDebugArgs() = argFlagIsOn ["--debug";"-d"]
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -61,7 +68,7 @@ let createMainWindow () =
         options.width <- 1200
         options.height <- 800
         options.show <- false
-        options.autoHideMenuBar <- true
+        options.autoHideMenuBar <- false
         options.frame <- true
         options.hasShadow <- true
         options.backgroundColor <-  "#5F9EA0"
@@ -81,12 +88,13 @@ let createMainWindow () =
     |> ignore
 
     // Load the index.html of the app.    
-    #if DEBUG
 
+#if DEBUG
     DevTools.installAllDevTools window
     DevTools.connectRemoteDevViaExtension()
 
-    window.webContents.openDevTools()
+    if debug then
+        window.webContents.openDevTools()
 
     sprintf "http://localhost:%s" ``process``.env?ELECTRON_WEBPACK_WDS_PORT
     |> window.loadURL
@@ -95,10 +103,10 @@ let createMainWindow () =
     ``process``.on("uncaughtException", fun err -> JS.console.error(err))
     |> ignore
 
-    #else
-
+    
+#else
     let url =
-        path.join(__dirname, "index.html")
+        path.join ( staticDir(),  "index.html")
         |> sprintf "file:%s" 
         |> Api.URL.Create
 
@@ -106,7 +114,7 @@ let createMainWindow () =
     |> window.loadURL
     |> ignore
 
-    #endif
+#endif    
     
     // Emitted when the window is closed.
     window.onClosed <| fun _ ->
