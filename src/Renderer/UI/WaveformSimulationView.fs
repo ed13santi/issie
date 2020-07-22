@@ -33,19 +33,20 @@ let stdWave : Wave =
 let initModel : WaveSimModel = //modify the position constants
     {
         waves = [
-                { stdWave with wIn = "Signal1", OneBitSig [One;Zero;Zero;One]}
+                { stdWave with wIn = "Signal1", OneBitSig [One;Zero;Zero;One;One;Zero;Zero;One;One;Zero;Zero;One;One;Zero;Zero;One]}
                 { stdWave with wIn = "Signal2", ManyBitSig [uint 4;uint 8;uint 3;uint 5;uint 0]}
-            ]
+                ]
         viewParams = {
             vPos      = uint 0
-            vSize     = uint 0.5
+            vSize     = 0.5
             hPos      = uint 0
-            hSize     = uint 1
+            hSize     = 1.0
             hNameSize = uint 2
             hValSize  = uint 8
             sigThick  = 0.02
-            hBoxSize = uint 10
+            hBoxSize = uint 8
             vBoxSize  = uint 15
+            spacing = 0.5
         }
         sigLimits = uint 0, uint 10
     }
@@ -84,7 +85,6 @@ let makeSigLine pointA pointB =
     makeSigLineArg pointA pointB
     |> makeLine
 
-
 //auxiliary functions to the viewer function
 
 let needTransitionIntermediateLst (lstSignalValues: SigVals) =
@@ -106,9 +106,9 @@ let displayWaveform parameters (ind: int) wave  =
     let waveform = wave.wIn
 
     let nameLeft = float parameters.hPos
-    let sigLeft = nameLeft + float parameters.hNameSize
-    let spaceBetweenWaves = 0.5
-    let sigHeight = 0.5//float parameters.vSize
+    let sigLeft = 0.0 //nameLeft + float parameters.hNameSize
+    let spaceBetweenWaves = parameters.spacing
+    let sigHeight = parameters.vSize
     let sigTop = float parameters.vPos + float ind * (spaceBetweenWaves + sigHeight) + spaceBetweenWaves
     let sigBot = sigHeight + sigTop
     let sigCentre = (sigTop+sigBot) / 2.0
@@ -195,27 +195,28 @@ let displayWaveform parameters (ind: int) wave  =
             ]
             [ str <| fst waveform ]
     
-    let waveValues = snd waveform
-    match waveValues with
-    | OneBitSig lst ->
-        List.zip lst [0..lst.Length-1]
-        |> List.zip (needTransitionAfter waveValues)
-        |> List.collect makeBitSegment 
-    | ManyBitSig lst ->
-        let transitionsTupleLst =
-            List.zip (needTransitionBefore waveValues) (needTransitionAfter waveValues)
-        List.zip lst [0..lst.Length-1]
-        |> List.zip transitionsTupleLst
-        |> List.collect makeBusSegment
-    |> List.append [label]
+    let waveSvgElements =
+        let waveValues = snd waveform
+        match waveValues with
+        | OneBitSig lst ->
+            List.zip lst [0..lst.Length-1]
+            |> List.zip (needTransitionAfter waveValues)
+            |> List.collect makeBitSegment 
+        | ManyBitSig lst ->
+            let transitionsTupleLst =
+                List.zip (needTransitionBefore waveValues) (needTransitionAfter waveValues)
+            List.zip lst [0..lst.Length-1]
+            |> List.zip transitionsTupleLst
+            |> List.collect makeBusSegment
+    label, waveSvgElements
 
 let makeBackground parameters = 
     let width = float parameters.hBoxSize
     let height = float parameters.vBoxSize
     let top = float parameters.vPos
     let bot = top + height
-    let left = float parameters.hPos + float parameters.hNameSize
-    let right = left + width
+    let left = 0.0 //float parameters.hPos + float parameters.hNameSize
+    let right = width
     let clkThickness = 0.025 //TODO: change to variable
     let clkLen = float parameters.hSize
     
@@ -228,9 +229,9 @@ let makeBackground parameters =
         }
         |> makeLine
 
-    [(int (left / clkLen) + 1)..1..(int (right / clkLen) + 1)]
+    [(int (left / clkLen) + 1)..1..(int (8.0 / clkLen) + 1)]
     |> List.map ((fun x -> float x * clkLen) >> clkLine)
-    |> List.append [makeBox (left,top) (right,bot)]
+    |> List.append [makeBox (left,top) (8.0,bot)]
 
     
 //view function of the waveform simulator
@@ -238,6 +239,14 @@ let makeBackground parameters =
 let viewWaveSim (model: DiagramModelType.Model) dispatch =
     let startWaveSim () = 
         dispatch <| StartWaveSim initModel
+    let hZoom up () =
+        let multBy = if up then 2.0 else 0.5 
+        match model.WaveSim with
+        | Some m ->
+            StartWaveSim { m with viewParams = { m.viewParams with hSize = m.viewParams.hSize*multBy}}  
+            |> dispatch
+        | _ ->
+            printf "What? hZoom function called when model.WaveSim is None"
         
     match model.WaveSim with
     | None ->
@@ -254,25 +263,68 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
             Button.button
                 [ Button.Color IsDanger; Button.OnClick endWaveSim ]
                 [ str "Close waveform simulator" ]
-            br []; br []
-            hr []
             div [] [
                 Heading.h5 [ Heading.Props [ Style [ MarginTop "15px" ] ] ] [ str "The simulator uses the diagram at the time of pressing the button" ]
             ]
-            let displayWaveWithParams = displayWaveform simModel.viewParams 
-            let svgList = 
-                List.mapi displayWaveWithParams simModel.waves 
-                |> List.collect (fun x -> x)
+            Button.button
+                [ Button.Color IsGrey; Button.OnClick (fun _ -> hZoom true ()) ]
+                [ str "H Zoom +" ]
+            Button.button
+                [ Button.Color IsDanger; Button.OnClick (fun _ -> hZoom false ()) ]
+                [ str "H Zoom -" ]
+            hr []
+            let displayWaveWithParams = displayWaveform simModel.viewParams  
+            let svgElements = List.mapi displayWaveWithParams simModel.waves 
+            let svgWaveforms = 
+                svgElements
+                |> List.collect snd
                 |> List.append (makeBackground simModel.viewParams)
-            
-            div [
-                Style [OverflowX OverflowOptions.Scroll] 
-                ]
+            let svgLabels =
+                svgElements
+                |> List.map fst
+
+            let appInv a b = 
+                b + a
+            let nSig = List.length simModel.waves
+            let scaleX = simModel.viewParams.hSize * 8.0
+            let scaleY = float nSig
+            let labelVBparams = 
+                "0 0 2 " + string scaleY
+                |> string
+            let wavesVBparams = 
+                "0 0 " + string scaleX
+                |> appInv " "
+                |> appInv (string (scaleY + 0.5))
+                |> string
+            let widthWave = 
+                100.0 * scaleX / 8.0
+                |> int
+                |> string
+                |> appInv "%"
+                |> string
+
+            div []
                 [
+                div 
+                    [ Style [Float FloatOptions.Left; Width "20%"] ]
+                    [
                     svg 
-                        [ ViewBox "0 0 10 15"; unbox ("width", "100%") ]//should be variables
-                        svgList              
-                    //right limit should be variable, check lower limit of box
-            ]
-            
+                        [ViewBox labelVBparams; unbox ("width", "100%")]
+                        svgLabels
+                    ]
+                div 
+                    [                      
+                    Style [OverflowX OverflowOptions.Scroll;
+                            Float FloatOptions.Right;
+                            Width "80%"]            
+                    ]
+                    [
+                    svg 
+                        [ 
+                        ViewBox wavesVBparams; 
+                        unbox ("width", widthWave) 
+                        ]
+                        svgWaveforms              
+                    ]
+                ] 
         ]

@@ -50,7 +50,7 @@ type SigVals =
 
 type Signal =  string * SigVals
 
-type PosParams = {vPos: uint ; vSize: uint; hPos: uint; hSize: uint; hNameSize: uint; hValSize: uint; sigThick: float; hBoxSize: uint; vBoxSize: uint}
+type PosParams = {vPos: uint ; vSize: float; hPos: uint; hSize: float; hNameSize: uint; hValSize: uint; sigThick: float; hBoxSize: uint; vBoxSize: uint; spacing: float}
 
 type Wave = 
     {
