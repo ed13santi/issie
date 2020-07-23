@@ -162,7 +162,7 @@ let displayWaveform parameters (ind: int) wave  =
                 X hCentre
                 Y (sigBot - sigHeight*0.1)
                 SVGAttr.Fill "black"
-                SVGAttr.FontSize (sigHeight * 0.8)
+                SVGAttr.FontSize (0.8 * sigHeight)
                 SVGAttr.TextAnchor "middle"
                 ]
                 [ str <| string value ]
@@ -185,7 +185,7 @@ let displayWaveform parameters (ind: int) wave  =
             X nameLeft
             Y sigCentre
             SVGAttr.Fill "black"
-            SVGAttr.FontSize sigHeight
+            SVGAttr.FontSize (0.25 + sigHeight * 0.3)
             SVGAttr.TextAnchor "start"
             ]
             [ str <| fst waveform ]
@@ -213,7 +213,6 @@ let makeBackground (model : WaveSimModel) =
     let top = float p.vPos
     let bot = top + height
     let left = 0.0 //float parameters.hPos + float parameters.hNameSize
-    let right = width
     let clkThickness = 0.025 //TODO: change to variable
     let clkLen = float p.hSize
 
@@ -244,6 +243,16 @@ let makeBackground (model : WaveSimModel) =
 let viewWaveSim (model: DiagramModelType.Model) dispatch =
     let startWaveSim () = 
         dispatch <| StartWaveSim initModel
+    let vZoom up () =
+        let multBy = if up then 2.0 else 0.5
+        match model.WaveSim with
+        | Some m ->
+            StartWaveSim { m with viewParams = { m.viewParams with vSize = m.viewParams.vSize*multBy;
+                                                                    spacing = m.viewParams.spacing*multBy}}
+            |> dispatch 
+        | _ ->
+            printf "What? vZoom function called when model.WaveSim is None"
+            
     let hZoom up () =
         let multBy = if up then 2.0 else 0.5 
         match model.WaveSim with
@@ -277,6 +286,12 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
             Button.button
                 [ Button.Color IsDanger; Button.OnClick (fun _ -> hZoom false ()) ]
                 [ str "H Zoom -" ]
+            Button.button
+                [ Button.Color IsGrey; Button.OnClick (fun _ -> vZoom true ()) ]
+                [ str "V Zoom +" ]
+            Button.button
+                [ Button.Color IsDanger; Button.OnClick (fun _ -> vZoom false ()) ]
+                [ str "V Zoom -" ]
             hr []
             let displayWaveWithParams = displayWaveform simModel.viewParams 
             let svgBg = makeBackground simModel
@@ -293,7 +308,7 @@ let viewWaveSim (model: DiagramModelType.Model) dispatch =
                 b + a
             let nSig = List.length simModel.waves
             let scaleX = simModel.viewParams.hSize * 8.0
-            let scaleY = float nSig
+            let scaleY = float nSig * (simModel.viewParams.vSize + simModel.viewParams.spacing)
             let labelVBparams = 
                 "0 0 2 " + string scaleY
                 |> string
