@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <None Include="scss\main.scss" />
@@ -25,6 +23,7 @@
     <Compile Include="UI/MemoryEditorView.fs" />
     <Compile Include="UI/FileMenuView.fs" />
     <Compile Include="UI/OnDiagramButtonsView.fs" />
+    <Compile Include="UI/WaveformSimulationView.fs" />
     <Compile Include="UI/SimulationView.fs" />
     <Compile Include="UI/CatalogueView.fs" />
     <Compile Include="UI/SelectedComponentView.fs" />
