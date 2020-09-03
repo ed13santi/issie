@@ -132,6 +132,7 @@ type Msg =
     | EndWaveSim
     | ChangeRightTab of RightTab
     | SetHighlighted of ComponentId list * ConnectionId list
+    | SetSelWavesSelected of WaveSimPort array
     | SetSelWavesHighlighted of ConnectionId list
     | SetClipboard of CanvasState
     | SetCreateComponent of Component
